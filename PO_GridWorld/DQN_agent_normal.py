@@ -6,5 +6,5 @@ env = PO_GridWorld(partially_observable=False)
 model = DQN("MlpPolicy", env, verbose=1,
             learning_rate=0.0001,
             gamma=0.9)
-model.learn(total_timesteps=100000)
-model.save("dqn_gridworld_normal")
+model.learn(total_timesteps=1000000)
+model.save("models/dqn_gridworld_normal")
