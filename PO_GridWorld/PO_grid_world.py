@@ -29,21 +29,27 @@ class PO_GridWorld(gym.Env):
             # The agent can see the precise position of itself (6*6)
             self.observation_space = spaces.Discrete(36)
         else:
-            # The agent can only see its position in a larger grid (3*3)
-            self.observation_space = spaces.Discrete(9)
+            # The agent can only see its position in a larger grid (2*2)
+            self.observation_space = spaces.Discrete(4)
         self.action_space = spaces.Discrete(4)
+
+        self.steps = 0
 
     def reset(self, seed=None, options=None):
         self.agent_pos = (5, 0)
+        self.steps = 0
         np.random.seed(seed)
         return self.get_observation(), {}
     
     def step(self, action):
+        self.steps += 1
         distribution = self.transition_distribution(self.agent_pos, action)
         rand = np.random.rand()
         cumulative_prob = 0
 
         reward = self.reward(self.agent_pos)
+        truncated = self.is_truncated()
+        #truncated = False
         done = self.is_terminal(self.agent_pos)
 
         for state, prob in distribution.items():
@@ -52,7 +58,7 @@ class PO_GridWorld(gym.Env):
                 self.agent_pos = state
                 break
 
-        return self.get_observation(), reward, done, False, {}
+        return self.get_observation(), reward, done, truncated, {}
 
     def reward(self, state):
         if self.grid[state[0]][state[1]] == 3: # Treasure chest
@@ -64,12 +70,17 @@ class PO_GridWorld(gym.Env):
         
     def get_observation(self):
         if self.partially_observable:
-            po_pos = (self.agent_pos[0] // 2, self.agent_pos[1] // 2)
-            obs = po_pos[0] * 3 + po_pos[1]
+            po_pos = (self.agent_pos[0] // 3, self.agent_pos[1] // 3)
+            obs = po_pos[0] * 2 + po_pos[1]
             return obs
         else:
             obs = self.agent_pos[0] * 6 + self.agent_pos[1]
             return obs
+        
+    def is_truncated(self):
+        if self.steps >= 500:
+            return True
+        return False
         
     def is_terminal(self, state):
         if self.grid[state[0]][state[1]] != 0:
