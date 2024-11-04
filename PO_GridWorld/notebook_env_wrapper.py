@@ -20,6 +20,7 @@ class NotebookEnvWrapper(gym.Env):
 
     def reset(self, seed=None, options=None):
         env_obs, info = self.env.reset(seed, options)
+        self.notebook = np.zeros(self.notebook_size, dtype=np.int32)
         return np.concatenate([[env_obs], self.notebook]), info
 
     def step(self, action):
