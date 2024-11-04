@@ -5,7 +5,7 @@ from stable_baselines3 import PPO
 env = PO_GridWorld(partially_observable=True)
 env_notebook = NotebookEnvWrapper(env)
 
-model = PPO.load("models_cmp/ppo_gridworld_notebook_0")
+model = PPO.load("models_cmp/ppo_gridworld_notebook_1")
 
 while True:
     state, _ = env_notebook.reset()
